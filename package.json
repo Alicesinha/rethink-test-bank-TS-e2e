@@ -1,0 +1,26 @@
+{
+  "name": "rethink-test-bank-ts-e2e",
+  "version": "1.0.0",
+  "description": "Testes end-to-end com Jest e TypeScript para a API do Rethink Test Bank",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --verbose"
+  },
+  "keywords": [
+    "jest",
+    "typescript",
+    "api",
+    "e2e",
+    "testing"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "@types/jest": "^29.5.12",
+    "axios": "^1.7.2",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.5",
+    "typescript": "^5.5.3"
+  }
+}
