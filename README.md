@@ -2,7 +2,7 @@
 
 Este repositório contém os testes end-to-end automatizados para a API do Rethink Test Bank. Os testes foram desenvolvidos com **Jest** e **TypeScript** para garantir maior robustez, segurança de tipos e manutenibilidade.
 
-O objetivo deste teste é validar se a jornada principal do usuário funciona conforme a documentação oficial e identificar quaisquer bugs ou inconsistências na API. O teste foi projetado para **falhar**, servindo como uma prova automatizada dos bugs listados neste relatório.
+O objetivo deste teste é validar se a jornada principal do usuário funciona conforme a documentação oficial e identificar quaisquer bugs ou inconsistências na API.
 
 ## Como Executar os Testes
 
@@ -10,7 +10,7 @@ Para clonar e rodar o projeto de testes, siga os passos abaixo.
 
 ### Pré-requisitos
 
-- [Node.js](https://nodejs.org/) (versão 18 ou superior)
+- [Node.js](https://nodejs.org/) (versão 18+)
 
 ### Passos para Execução
 
