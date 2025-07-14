@@ -4,7 +4,7 @@ Para clonar e rodar o projeto de testes, siga os passos abaixo.
 
 ### Pré-requisitos
 
-- [Node.js](https://nodejs.org/) (versão 18 ou superior)
+- [Node.js](https://nodejs.org/) (versão 18+)
 
 ### Passos para Execução
 
