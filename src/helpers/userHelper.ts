@@ -9,7 +9,6 @@ export interface TestUser {
 	fullName: string
 }
 
-// Helper para criar uma pausa
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 export async function createConfirmedUser(): Promise<TestUser> {
@@ -35,10 +34,8 @@ export async function createConfirmedUser(): Promise<TestUser> {
 
 	await api.get(`/confirm-email?token=${confirmToken}`)
 
-	// ---- ADIÇÃO IMPORTANTE ----
 	// Damos 2 segundos para a API processar a ativação do usuário
 	await sleep(2000)
-	// -------------------------
 
 	console.log(`Usuário de teste criado e confirmado: ${userData.email}`)
 	return userData

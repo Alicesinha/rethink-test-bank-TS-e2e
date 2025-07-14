@@ -1,7 +1,6 @@
 import { faker } from '@faker-js/faker'
 import { api } from '../helpers/api'
 import { generateCpf } from '../utils/dataGenerator'
-import axios from 'axios'
 
 describe('Auth | Testes de Cadastro e Login', () => {
 	test('[Sucesso] Deve registrar um novo usuário com dados válidos', async () => {
@@ -12,7 +11,6 @@ describe('Auth | Testes de Cadastro e Login', () => {
 			password: `SenhaValida@123`,
 			confirmPassword: `SenhaValida@123`,
 		})
-		// Este teste continuará falhando enquanto o Bug de cadastro existir, o que é correto.
 		expect(response.status).toBe(201)
 	})
 
@@ -32,7 +30,6 @@ describe('Auth | Testes de Cadastro e Login', () => {
 			await api.post('/cadastro', { cpf /* ... */ })
 			fail('A API deveria ter retornado um erro de CPF duplicado.')
 		} catch (error: any) {
-			// CORRETO: Esperamos 409 Conflict. O teste vai falhar porque a API retorna 400.
 			expect(error.response?.status).toBe(409)
 		}
 	})
@@ -46,7 +43,6 @@ describe('Auth | Testes de Cadastro e Login', () => {
 			})
 			fail('A API deveria ter retornado um erro de usuário inexistente.')
 		} catch (error: any) {
-			// CORRETO: Esperamos 404 Not Found. O teste vai falhar porque a API retorna 400.
 			expect(error.response?.status).toBe(404)
 		}
 	})
