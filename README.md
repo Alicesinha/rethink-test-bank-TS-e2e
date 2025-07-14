@@ -1,9 +1,3 @@
-# Relatório de Testes End-to-End - API Rethink Test Bank (com TypeScript)
-
-Este repositório contém os testes end-to-end automatizados para a API do Rethink Test Bank. Os testes foram desenvolvidos com **Jest** e **TypeScript** para garantir maior robustez, segurança de tipos e manutenibilidade.
-
-O objetivo deste teste é validar se a jornada principal do usuário funciona conforme a documentação oficial e identificar quaisquer bugs ou inconsistências na API.
-
 ## Como Executar os Testes
 
 Para clonar e rodar o projeto de testes, siga os passos abaixo.
@@ -27,41 +21,63 @@ Para clonar e rodar o projeto de testes, siga os passos abaixo.
         npm test
     ```
 
-## Análise de Bugs, Criticidade e Prontidão para Produção
+# Relatório Final de Testes de Qualidade – API Rethink Test Bank
 
-Aqui estão as respostas para as perguntas do desafio com base nos resultados dos testes automatizados.
+Este documento apresenta os resultados da análise e da execução de testes end-to-end automatizados na API do Rethink Test Bank. A suíte de testes foi desenvolvida utilizando Jest e TypeScript para validar a jornada do usuário e a conformidade da API com as boas práticas de desenvolvimento.
 
-### a. Há bugs? Se sim, quais são e quais são os cenários esperados?
+A análise revelou múltiplos bugs, incluindo falhas críticas que comprometem a funcionalidade central do sistema.
 
-**Sim, foram encontrados 2 bugs críticos** durante a execução dos testes.
+---
+
+### a- Há bugs? Se sim, quais são e quais são os cenários esperados?
+
+**Sim, foram encontrados 4 bugs distintos**, variando de falhas de design a erros críticos na lógica de negócio.
 
 #### Bug 1: Endpoint de Envio de Pontos Incorreto (Contrato da API Quebrado)
 
-- **Cenário do Bug:**
-  A documentação da API especifica que a transferência de pontos deve ser feita via `POST /points/send`. No entanto, este endpoint retorna um erro **`404 Not Found`**. O teste automatizado neste repositório **prova a existência deste bug**, pois ele chama exatamente este endpoint e falha, conforme esperado.
-
-- **Cenário Esperado:**
-  A API deveria seguir o contrato de sua documentação. Uma requisição `POST` para `/points/send` deveria processar a transferência e retornar uma resposta de sucesso com status `200 OK`.
+- **Cenário do Bug:** A documentação oficial especifica que a transferência de pontos deve ocorrer na rota `POST /points/send`. No entanto, qualquer chamada para este endpoint resulta em um erro `404 Not Found`, indicando que a rota não existe.
+- **Cenário Esperado:** A API deve implementar e responder na rota `POST /points/send`, conforme especificado em seu contrato (documentação). Uma requisição válida para este endpoint deveria processar a transação e retornar um status `200 OK`.
 
 #### Bug 2: Saldo do Usuário Não é Atualizado Após Transações
 
-- **Cenário do Bug:**
-  Para aprofundar a investigação, o teste foi temporariamente modificado para usar um endpoint não documentado que foi descoberto (`/transaction/send`). Com essa alteração, foi possível prosseguir na jornada e identificar um segundo bug: após realizar com sucesso uma transferência de 50 pontos e um depósito de 30 pontos, a API informa que o saldo principal (`normal_balance`) do usuário continua sendo 100, quando o valor correto deveria ser 20 (100 - 50 - 30).
+- **Cenário do Bug:** Ao utilizar um endpoint alternativo funcional (`/transaction/send`), a API retorna uma mensagem de sucesso para o envio de pontos. Contudo, ao consultar o saldo do usuário em seguida (`GET /points/saldo`), o valor do `normal_balance` permanece inalterado, como se nenhuma transação tivesse ocorrido.
+- **Cenário Esperado:** Qualquer transação de débito (envio de pontos, depósito em cofre, etc.) deve ser refletida de forma imediata e precisa no saldo geral do usuário.
 
-- **Cenário Esperado:**
-  As transações (envio de pontos e depósitos) devem debitar o valor correspondente do saldo principal do usuário. O endpoint `GET /points/saldo` deve retornar o valor matemático correto do saldo após cada operação.
+#### Bug 3: Uso de Códigos de Status HTTP Inadequados
 
-### b. Se houver bugs, classifique-os em nível de criticidade.
+- **Cenário do Bug:** A API utiliza o código de status genérico `400 Bad Request` para múltiplos cenários de erro distintos, que deveriam ter códigos específicos, como:
+  1.  Cadastro com CPF que já existe (retorna `400` em vez de `409 Conflict`).
+  2.  Login com um e-mail que não existe na base (retorna `400` em vez de `404 Not Found`).
+  3.  Login com um usuário cujo e-mail não foi confirmado (retorna `400` em vez de `401 Unauthorized` ou `403 Forbidden`).
+- **Cenário Esperado:** A API deve empregar códigos de status HTTP específicos para cada tipo de erro, seguindo as convenções de APIs RESTful. Isso é fundamental para que os sistemas clientes possam tratar os erros de forma programática e eficiente.
 
-Ambos os bugs são classificados como **Críticos (Critical) / Bloqueadores (Blocker)**.
+#### Bug 4: Falha Inconsistente no Cadastro de Usuários
 
-- **Justificativa (Bug 1):** A quebra do contrato da API (documentação vs. implementação) torna a integração com o sistema não confiável e propensa a erros, bloqueando o desenvolvimento de aplicações cliente.
+- **Cenário do Bug:** O endpoint `POST /cadastro` frequentemente retorna `400 Bad Request` mesmo quando os dados enviados parecem atender a todos os critérios de validação documentados (formato de CPF, força da senha, etc.). Isso torna o ponto de entrada principal do sistema instável e imprevisível.
+- **Cenário Esperado:** O endpoint de cadastro deve retornar `201 Created` de forma consistente sempre que os dados da requisição forem válidos, ou retornar um erro `400` com uma mensagem clara especificando qual campo falhou na validação.
 
-- **Justificativa (Bug 2):** Esta é uma falha grave na lógica de negócio principal. O sistema permite que os usuários realizem transações sem que o saldo seja debitado, o que pode levar a um "dinheiro infinito" virtual, quebrando completamente o propósito do sistema de pontos.
+---
 
-### c. Diante do cenário, o sistema está pronto para subir em produção?
+### b- Se houver bugs, classifique-os em nível de criticidade.
+
+| Bug | Título                        | Criticidade              | Justificativa                                                                                                       |
+| :-- | :---------------------------- | :----------------------- | :------------------------------------------------------------------------------------------------------------------ |
+| #1  | Endpoint Incorreto            | **Crítico / Bloqueador** | Impede a execução da funcionalidade principal conforme o contrato. Viola a confiança na documentação.               |
+| #2  | Saldo não Atualiza            | **Crítico / Bloqueador** | Falha catastrófica na lógica de negócio. Corrompe a integridade dos dados e o propósito central do sistema.         |
+| #3  | Códigos de Status Inadequados | **Médio**                | Não impede o funcionamento, mas indica baixa qualidade técnica, viola as convenções e dificulta a integração.       |
+| #4  | Falha no Cadastro             | **Alto**                 | Impede de forma inconsistente que novos usuários entrem no sistema, tornando a aquisição de usuários não confiável. |
+
+---
+
+### c- Diante do cenário, o sistema está pronto para subir em produção?
 
 **Não, em hipótese alguma.**
 
-- **Justificativa:**
-  O sistema apresenta falhas críticas em suas funcionalidades mais essenciais. O **Bug 1** demonstra uma falta de governança e cuidado com a API, enquanto o **Bug 2** representa uma falha catastrófica na lógica de negócio que compromete toda a integridade da plataforma. Lançar o sistema neste estado resultaria em uma experiência de usuário quebrada, perda total de confiança e potencial exploração de falhas. É mandatório que ambos os bugs sejam corrigidos e que uma nova rodada completa de testes de regressão (usando este mesmo script) seja executada com sucesso antes de qualquer nova consideração sobre o lançamento em produção.
+O sistema, no estado atual, apresenta falhas graves que o tornam completamente inviável para um ambiente de produção. Os dois bugs classificados como **críticos** são suficientes para vetar o lançamento:
+
+1.  A **lógica de negócio principal está fundamentalmente quebrada** (Bug #2). Um sistema de pontos que não debita os pontos transacionados não tem valor funcional e pode ser facilmente explorado.
+2.  A **API não cumpre seu próprio contrato** (Bug #1), o que impossibilitaria o desenvolvimento e a manutenção de qualquer aplicação cliente (web, mobile) que dependa dela.
+
+Além disso, a instabilidade no endpoint de cadastro (Bug #4) e o design pobre de tratamento de erros (Bug #3) demonstram uma falta de maturidade e qualidade que resultaria em uma péssima experiência para o usuário e altos custos de manutenção.
+
+Lançar este sistema em produção levaria a inconsistência de dados, perda de confiança do usuário e falhas operacionais severas. É mandatório que, no mínimo, os bugs de criticidade Crítica e Alta sejam corrigidos e uma nova rodada completa de testes de regressão seja executada com sucesso.
